@@ -3,25 +3,28 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>PRISM - Projet IONIS Goodwills</title>
+    <title>PRISM - Projet Économie Circulaire IONIS</title>
     <script src="https://unpkg.com/lucide@latest"></script>
     <script src="https://cdn.tailwindcss.com"></script>
-    <link href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@300;400;600;800&display=swap" rel="stylesheet">
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@300;400;600;800&display=swap" rel="stylesheet">
     <style>
         body {
-            font-family: 'Plus Jakarta Sans', sans-serif;
-            background-color: #0f172a;
+            font-family: 'Inter', sans-serif;
+            background-color: #030712; /* Very dark blue */
             color: #f8fafc;
             overflow: hidden;
         }
         
-        /* Gradients et Effets "Safeplace" */
-        .prism-gradient {
-            background: linear-gradient(135deg, #6366f1 0%, #a855f7 50%, #ec4899 100%);
+        /* Gradients Pro / Tech */
+        .tech-gradient {
+            background: linear-gradient(135deg, #0ea5e9 0%, #3b82f6 50%, #6366f1 100%);
         }
-        
-        .safe-glow {
-            box-shadow: 0 0 40px rgba(168, 85, 247, 0.15);
+
+        .glass-panel {
+            background: rgba(17, 24, 39, 0.7);
+            backdrop-filter: blur(20px);
+            border: 1px solid rgba(255, 255, 255, 0.08);
+            box-shadow: 0 4px 30px rgba(0, 0, 0, 0.5);
         }
 
         .slide-container {
@@ -38,406 +41,431 @@
             width: 100%;
             height: 100%;
             opacity: 0;
-            transform: translateY(20px);
-            transition: all 0.6s cubic-bezier(0.4, 0, 0.2, 1);
+            transform: scale(0.95);
+            transition: all 0.7s cubic-bezier(0.25, 0.8, 0.25, 1);
             pointer-events: none;
             display: flex;
             flex-direction: column;
             justify-content: center;
             padding: 2rem;
+            visibility: hidden;
         }
 
         .slide.active {
             opacity: 1;
-            transform: translateY(0);
+            transform: scale(1);
             pointer-events: all;
             z-index: 10;
+            visibility: visible;
         }
 
-        /* Mockup Containers */
-        .mockup-card {
-            background: rgba(255, 255, 255, 0.05);
-            backdrop-filter: blur(12px);
-            border: 1px solid rgba(255, 255, 255, 0.1);
-            border-radius: 24px;
-        }
-
-        .role-badge {
-            background: rgba(255, 255, 255, 0.1);
-            border: 1px solid rgba(255, 255, 255, 0.2);
-            padding: 0.5rem 1rem;
-            border-radius: 999px;
-            font-size: 0.8rem;
-            text-transform: uppercase;
-            letter-spacing: 1px;
-        }
-
-        .nav-dots {
+        /* Elements graphiques */
+        .grid-bg {
+            background-image: linear-gradient(rgba(255, 255, 255, 0.03) 1px, transparent 1px),
+            linear-gradient(90deg, rgba(255, 255, 255, 0.03) 1px, transparent 1px);
+            background-size: 40px 40px;
             position: absolute;
-            bottom: 2rem;
-            left: 50%;
-            transform: translateX(-50%);
-            display: flex;
-            gap: 1rem;
-            z-index: 50;
+            inset: 0;
+            z-index: -1;
         }
 
-        .dot {
-            width: 12px;
-            height: 12px;
+        .orb {
+            position: absolute;
             border-radius: 50%;
-            background: rgba(255, 255, 255, 0.2);
-            cursor: pointer;
-            transition: all 0.3s ease;
+            filter: blur(80px);
+            z-index: -1;
+            opacity: 0.4;
         }
 
-        .dot.active {
-            background: #fff;
-            transform: scale(1.2);
+        /* Animations */
+        @keyframes float-tech {
+            0%, 100% { transform: translateY(0); }
+            50% { transform: translateY(-10px); }
+        }
+        
+        .floating {
+            animation: float-tech 5s ease-in-out infinite;
         }
 
-        /* Animations spécifiques */
-        .float {
-            animation: float 6s ease-in-out infinite;
-        }
-        @keyframes float {
-            0% { transform: translateY(0px); }
-            50% { transform: translateY(-20px); }
-            100% { transform: translateY(0px); }
-        }
-
-        .pulse-slow {
-            animation: pulse-glow 4s infinite;
-        }
-        @keyframes pulse-glow {
-            0%, 100% { opacity: 0.6; }
-            50% { opacity: 1; }
+        .stat-number {
+            font-variant-numeric: tabular-nums;
         }
     </style>
 </head>
 <body>
 
-    <!-- Navigation Overlay -->
-    <div class="fixed top-0 left-0 w-full p-6 flex justify-between items-center z-50 pointer-events-none">
-        <div class="text-xl font-bold tracking-tighter flex items-center gap-2 pointer-events-auto">
-            <i data-lucide="hexagon" class="text-purple-400 fill-purple-400/20"></i>
-            PRISM
-        </div>
-        <div class="text-sm font-medium text-slate-400">IONIS GOODWILLS 2026</div>
-    </div>
+    <!-- Background Elements -->
+    <div class="grid-bg"></div>
+    <div class="orb w-[500px] h-[500px] bg-blue-900/30 top-[-100px] left-[-100px]"></div>
+    <div class="orb w-[400px] h-[400px] bg-indigo-900/30 bottom-[-50px] right-[-50px]"></div>
 
-    <!-- Navigation Dots -->
-    <div class="nav-dots" id="dots">
-        <div class="dot active" onclick="goToSlide(0)"></div>
-        <div class="dot" onclick="goToSlide(1)"></div>
-        <div class="dot" onclick="goToSlide(2)"></div>
-        <div class="dot" onclick="goToSlide(3)"></div>
-        <div class="dot" onclick="goToSlide(4)"></div>
+    <!-- Header -->
+    <div class="fixed top-0 left-0 w-full p-8 flex justify-between items-center z-50">
+        <div class="flex items-center gap-3">
+            <div class="w-8 h-8 rounded bg-gradient-to-br from-blue-500 to-indigo-600 flex items-center justify-center shadow-lg shadow-blue-500/20">
+                <i data-lucide="layers" class="text-white w-5 h-5"></i>
+            </div>
+            <span class="font-bold tracking-tight text-xl">PRISM</span>
+        </div>
+        <div class="flex gap-2">
+            <div class="h-1 w-8 rounded-full bg-blue-500 transition-all duration-300" id="indicator-0"></div>
+            <div class="h-1 w-8 rounded-full bg-slate-700 transition-all duration-300" id="indicator-1"></div>
+            <div class="h-1 w-8 rounded-full bg-slate-700 transition-all duration-300" id="indicator-2"></div>
+            <div class="h-1 w-8 rounded-full bg-slate-700 transition-all duration-300" id="indicator-3"></div>
+        </div>
     </div>
 
     <!-- Controls -->
-    <button onclick="prevSlide()" class="fixed left-4 top-1/2 -translate-y-1/2 z-50 p-3 rounded-full bg-white/5 hover:bg-white/10 transition backdrop-blur-sm">
-        <i data-lucide="chevron-left" class="text-white"></i>
-    </button>
-    <button onclick="nextSlide()" class="fixed right-4 top-1/2 -translate-y-1/2 z-50 p-3 rounded-full bg-white/5 hover:bg-white/10 transition backdrop-blur-sm">
-        <i data-lucide="chevron-right" class="text-white"></i>
-    </button>
+    <div class="fixed bottom-8 right-8 flex gap-4 z-50">
+        <button onclick="prevSlide()" class="p-4 rounded-full glass-panel hover:bg-white/5 transition border border-slate-700">
+            <i data-lucide="arrow-left" class="text-slate-300"></i>
+        </button>
+        <button onclick="nextSlide()" class="p-4 rounded-full bg-blue-600 hover:bg-blue-500 transition text-white shadow-lg shadow-blue-600/20">
+            <i data-lucide="arrow-right"></i>
+        </button>
+    </div>
 
     <div class="slide-container">
 
         <!-- SLIDE 1: INTRO -->
         <div class="slide active" id="slide-0">
-            <div class="max-w-6xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-12 items-center">
-                <div class="space-y-8">
-                    <div class="inline-flex items-center gap-2 px-4 py-2 rounded-full bg-purple-500/10 border border-purple-500/20 text-purple-300 text-sm font-medium">
-                        <span class="w-2 h-2 rounded-full bg-purple-400 animate-pulse"></span>
-                        Projet Candidat Goodwills
+            <div class="max-w-7xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+                <div class="space-y-6">
+                    <div class="inline-flex items-center gap-2 px-3 py-1 rounded border border-blue-500/30 bg-blue-500/10 text-blue-400 text-xs uppercase tracking-widest font-semibold">
+                        IONIS Goodwills 2026
                     </div>
-                    <h1 class="text-7xl font-bold leading-tight">
-                        L'Architecture de <br>
-                        <span class="text-transparent bg-clip-text prism-gradient">l'Équité Radicale</span>
+                    <h1 class="text-6xl lg:text-7xl font-bold leading-tight tracking-tight">
+                        Optimiser.<br>
+                        Partager.<br>
+                        <span class="text-transparent bg-clip-text tech-gradient">Innover.</span>
                     </h1>
-                    <p class="text-xl text-slate-400 max-w-lg leading-relaxed">
-                        PRISM n'est pas juste une application. C'est un écosystème phygital qui transforme chaque campus IONIS en une "Safe Place" adaptative, neuro-inclusive et bienveillante.
+                    <p class="text-lg text-slate-400 max-w-lg leading-relaxed border-l-2 border-slate-700 pl-6">
+                        PRISM brise les silos entre les écoles. La première plateforme d'économie circulaire qui permet aux étudiants d'échanger matériel et compétences via une monnaie interne.
                     </p>
-                    <button onclick="nextSlide()" class="group px-8 py-4 bg-white text-slate-900 rounded-full font-bold flex items-center gap-3 hover:scale-105 transition shadow-[0_0_20px_rgba(255,255,255,0.3)]">
-                        Découvrir le concept
-                        <i data-lucide="arrow-right" class="group-hover:translate-x-1 transition"></i>
-                    </button>
+                    <div class="flex gap-6 pt-4">
+                        <div class="flex flex-col">
+                            <span class="text-3xl font-bold text-white">29K+</span>
+                            <span class="text-sm text-slate-500 uppercase tracking-wider">Étudiants</span>
+                        </div>
+                        <div class="w-px h-12 bg-slate-800"></div>
+                        <div class="flex flex-col">
+                            <span class="text-3xl font-bold text-white">1 App</span>
+                            <span class="text-sm text-slate-500 uppercase tracking-wider">Écosystème</span>
+                        </div>
+                    </div>
                 </div>
-                
-                <!-- Visual Abstract Representation -->
-                <div class="relative h-[600px] flex items-center justify-center float">
-                    <div class="absolute w-[500px] h-[500px] bg-purple-600/20 rounded-full blur-[100px]"></div>
-                    <div class="absolute w-[300px] h-[300px] bg-blue-500/20 rounded-full blur-[80px] translate-x-20 -translate-y-20"></div>
-                    
-                    <div class="relative z-10 mockup-card w-full h-full p-8 flex flex-col items-center justify-center text-center border-slate-700/50">
-                         <i data-lucide="shield-check" class="w-32 h-32 text-purple-300 mb-6 stroke-1"></i>
-                         <h3 class="text-2xl font-bold mb-2">Safeplace Certifiée</h3>
-                         <p class="text-slate-400">Zone de décompression sensorielle</p>
-                         
-                         <!-- Simulated UI Elements -->
-                         <div class="mt-8 flex gap-4">
-                            <div class="w-16 h-16 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center">
-                                <i data-lucide="ear-off" class="text-teal-400"></i>
+
+                <!-- Abstract Visual -->
+                <div class="relative h-[600px] flex items-center justify-center">
+                    <!-- Cards orbiting -->
+                    <div class="absolute w-[280px] h-[160px] glass-panel rounded-xl p-4 top-[20%] right-[10%] floating z-20 flex flex-col justify-between border-l-4 border-l-blue-500">
+                        <div class="flex justify-between items-start">
+                            <div class="flex gap-3 items-center">
+                                <div class="w-10 h-10 rounded-full bg-slate-700 overflow-hidden">
+                                    <img src="https://ui-avatars.com/api/?name=Alex+D&background=0D8ABC&color=fff" alt="User">
+                                </div>
+                                <div>
+                                    <div class="text-sm font-bold">Alex (Epitech)</div>
+                                    <div class="text-xs text-slate-400">Cherche: Logo Design</div>
+                                </div>
                             </div>
-                            <div class="w-16 h-16 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center">
-                                <i data-lucide="eye-off" class="text-purple-400"></i>
+                            <span class="text-blue-400 font-mono text-xs font-bold">-50 TK</span>
+                        </div>
+                        <div class="w-full bg-slate-700/50 h-1.5 rounded-full overflow-hidden mt-2">
+                            <div class="bg-blue-500 h-full w-2/3"></div>
+                        </div>
+                    </div>
+
+                    <div class="absolute w-[280px] h-[160px] glass-panel rounded-xl p-4 bottom-[20%] left-[10%] floating z-10 flex flex-col justify-between border-l-4 border-l-pink-500" style="animation-delay: 1s;">
+                        <div class="flex justify-between items-start">
+                            <div class="flex gap-3 items-center">
+                                <div class="w-10 h-10 rounded-full bg-slate-700 overflow-hidden">
+                                    <img src="https://ui-avatars.com/api/?name=Sarah+M&background=E11D48&color=fff" alt="User">
+                                </div>
+                                <div>
+                                    <div class="text-sm font-bold">Sarah (e-artsup)</div>
+                                    <div class="text-xs text-slate-400">Offre: Canon 5D Mark IV</div>
+                                </div>
                             </div>
-                            <div class="w-16 h-16 rounded-2xl bg-slate-800 border border-slate-700 flex items-center justify-center">
-                                <i data-lucide="heart-handshake" class="text-pink-400"></i>
-                            </div>
-                         </div>
+                            <span class="text-green-400 font-mono text-xs font-bold">+20 TK/Jour</span>
+                        </div>
+                        <div class="flex gap-2 mt-2">
+                             <span class="px-2 py-1 rounded bg-slate-800 text-[10px] text-slate-300">Dispo: Campus Paris</span>
+                        </div>
+                    </div>
+
+                    <!-- Center Core -->
+                    <div class="w-64 h-64 rounded-full border border-blue-500/20 flex items-center justify-center relative">
+                        <div class="absolute inset-0 rounded-full border border-blue-400/10 animate-[spin_10s_linear_infinite]"></div>
+                        <div class="absolute inset-4 rounded-full border border-indigo-400/10 animate-[spin_15s_linear_infinite_reverse]"></div>
+                        <div class="w-32 h-32 rounded-full bg-gradient-to-br from-blue-600 to-indigo-600 blur-2xl opacity-50"></div>
+                        <i data-lucide="network" class="w-16 h-16 text-white relative z-10"></i>
                     </div>
                 </div>
             </div>
         </div>
 
-        <!-- SLIDE 2: THE PROBLEM (Woke Context) -->
+        <!-- SLIDE 2: LOGIQUE / PROBLEME -->
         <div class="slide" id="slide-1">
             <div class="max-w-5xl mx-auto w-full">
-                <h2 class="text-4xl font-bold mb-12 text-center">L'Enjeu : La Charge Invisible</h2>
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-8">
-                    
-                    <div class="mockup-card p-8 hover:bg-white/5 transition duration-500 group">
-                        <div class="w-12 h-12 rounded-full bg-red-500/20 flex items-center justify-center mb-6 text-red-400">
-                            <i data-lucide="activity"></i>
+                <div class="text-center mb-16">
+                    <h2 class="text-4xl font-bold mb-4">Le Paradoxe IONIS</h2>
+                    <p class="text-slate-400">Nous sommes 29 000 étudiants, mais nous agissons comme des individus isolés.</p>
+                </div>
+
+                <div class="grid grid-cols-1 md:grid-cols-3 gap-6">
+                    <!-- Problem 1 -->
+                    <div class="glass-panel p-8 rounded-2xl relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+                            <i data-lucide="trending-down" class="w-24 h-24 text-red-500"></i>
                         </div>
-                        <h3 class="text-xl font-bold mb-3">Surcharge Sensorielle</h3>
-                        <p class="text-slate-400 leading-relaxed">
-                            Pour les étudiants neuroatypiques (TSA, TDAH, HPI), le bruit et la lumière des campus ouverts sont des agressions constantes qui brident le potentiel académique.
+                        <div class="w-12 h-12 bg-red-500/10 rounded-lg flex items-center justify-center mb-6">
+                            <i data-lucide="wallet" class="text-red-400 w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Gaspillage Financier</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed">
+                            Chaque étudiant achète son propre matériel (caméras, drones, livres techniques) qui dort 90% du temps dans un placard.
                         </p>
                     </div>
 
-                    <div class="mockup-card p-8 hover:bg-white/5 transition duration-500 group">
-                        <div class="w-12 h-12 rounded-full bg-orange-500/20 flex items-center justify-center mb-6 text-orange-400">
-                            <i data-lucide="users"></i>
+                    <!-- Problem 2 -->
+                    <div class="glass-panel p-8 rounded-2xl relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+                            <i data-lucide="users" class="w-24 h-24 text-orange-500"></i>
                         </div>
-                        <h3 class="text-xl font-bold mb-3">Micro-agressions</h3>
-                        <p class="text-slate-400 leading-relaxed">
-                            Le sentiment d'insécurité lié au genre ou à l'origine crée une "charge mentale de vigilance". L'étudiant ne peut pas être lui-même à 100%.
+                        <div class="w-12 h-12 bg-orange-500/10 rounded-lg flex items-center justify-center mb-6">
+                            <i data-lucide="lock" class="text-orange-400 w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Silos de Compétences</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed">
+                            Les projets étudiants échouent souvent car il manque UNE compétence (ex: un dev manque d'un designer, un commercial manque d'un dev).
                         </p>
                     </div>
 
-                    <div class="mockup-card p-8 hover:bg-white/5 transition duration-500 group">
-                        <div class="w-12 h-12 rounded-full bg-blue-500/20 flex items-center justify-center mb-6 text-blue-400">
-                            <i data-lucide="map-off"></i>
+                    <!-- Problem 3 -->
+                    <div class="glass-panel p-8 rounded-2xl relative overflow-hidden group">
+                        <div class="absolute top-0 right-0 p-4 opacity-10 group-hover:opacity-20 transition">
+                            <i data-lucide="bar-chart-2" class="w-24 h-24 text-purple-500"></i>
                         </div>
-                        <h3 class="text-xl font-bold mb-3">Espaces Inadaptés</h3>
-                        <p class="text-slate-400 leading-relaxed">
-                            Manque de lieux de repli, toilettes genrées binaires, absence de "Calm Zones". L'architecture actuelle des écoles exclut involontairement.
+                        <div class="w-12 h-12 bg-purple-500/10 rounded-lg flex items-center justify-center mb-6">
+                            <i data-lucide="building" class="text-purple-400 w-6 h-6"></i>
+                        </div>
+                        <h3 class="text-xl font-bold mb-3">Locaux Sous-utilisés</h3>
+                        <p class="text-sm text-slate-400 leading-relaxed">
+                            Des salles vides le soir à l'ISG pourraient servir de studio photo pour e-artsup. L'immobilier est mal optimisé.
                         </p>
                     </div>
-
                 </div>
             </div>
         </div>
 
-        <!-- SLIDE 3: THE SOLUTION (Phygital) -->
+        <!-- SLIDE 3: SOLUTION TECHNIQUE -->
         <div class="slide" id="slide-2">
-            <div class="max-w-6xl mx-auto w-full grid grid-cols-1 lg:grid-cols-2 gap-16 items-center">
+            <div class="max-w-6xl mx-auto w-full grid grid-cols-1 lg:grid-cols-12 gap-12 h-full items-center">
                 
-                <!-- Visual Product Demo -->
-                <div class="relative">
-                    <!-- The App UI -->
-                    <div class="mockup-card p-6 w-[350px] mx-auto absolute top-0 left-10 z-20 shadow-2xl rotate-[-5deg] bg-slate-900 border-slate-700">
-                        <div class="flex justify-between items-center mb-6 border-b border-slate-800 pb-4">
-                            <span class="font-bold">PRISM App</span>
-                            <i data-lucide="wifi" class="w-4 h-4 text-green-500"></i>
-                        </div>
-                        <div class="space-y-3">
-                            <div class="p-3 bg-slate-800 rounded-lg flex items-center gap-3">
-                                <div class="w-2 h-2 rounded-full bg-green-500"></div>
-                                <div class="text-xs">Cafétéria: <span class="text-slate-400">Bruyant (85dB)</span></div>
-                            </div>
-                            <div class="p-3 bg-indigo-900/50 border border-indigo-500/30 rounded-lg flex items-center gap-3">
-                                <div class="w-2 h-2 rounded-full bg-indigo-400 animate-pulse"></div>
-                                <div class="text-xs font-bold text-indigo-200">Zone Calme: <span class="text-white">Salle 204 (Dispo)</span></div>
-                            </div>
-                            <div class="h-32 bg-slate-800 rounded-lg flex items-center justify-center relative overflow-hidden">
-                                <div class="absolute inset-0 bg-[url('https://images.unsplash.com/photo-1557683316-973673baf926?w=400&q=80')] opacity-20 bg-cover"></div>
-                                <button class="bg-indigo-600 text-white text-xs px-4 py-2 rounded-full relative z-10">Réserver un Pod</button>
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- The Physical Pod -->
-                    <div class="mockup-card w-[400px] h-[500px] ml-auto relative z-10 bg-gradient-to-br from-slate-800 to-slate-900 flex flex-col items-center justify-end p-8 border-slate-600">
-                        <div class="absolute inset-0 flex items-center justify-center">
-                            <div class="w-64 h-80 border-2 border-slate-600 rounded-t-[100px] rounded-b-3xl relative flex items-end justify-center pb-4 bg-slate-900/50">
-                                <div class="absolute top-10 text-slate-500 text-xs tracking-widest">ECO-POD V1</div>
-                                <i data-lucide="user" class="w-32 h-32 text-slate-700"></i>
-                            </div>
-                        </div>
-                        <div class="text-center relative z-10 mt-auto">
-                            <h4 class="font-bold text-lg">Le "Cocon"</h4>
-                            <p class="text-xs text-slate-400">Isolation phonique & Matériaux Bio-sourcés</p>
-                        </div>
-                    </div>
-                </div>
-
-                <div class="space-y-8 pl-8">
-                    <h2 class="text-4xl font-bold">L'Écosystème <span class="text-purple-400">PRISM</span></h2>
+                <!-- Left: Logic -->
+                <div class="col-span-5 space-y-8">
+                    <h2 class="text-4xl font-bold">L'Architecture <span class="text-blue-500">PRISM</span></h2>
+                    <p class="text-slate-400">Une infrastructure "Smart Campus" basée sur 3 piliers logiques.</p>
                     
-                    <div class="space-y-6">
-                        <div class="flex gap-4">
-                            <div class="w-12 h-12 rounded-xl bg-purple-500/20 flex-shrink-0 flex items-center justify-center text-purple-400">
-                                <i data-lucide="map"></i>
+                    <div class="space-y-4">
+                        <div class="flex items-start gap-4 p-4 rounded-xl hover:bg-white/5 transition border border-transparent hover:border-slate-700">
+                            <div class="mt-1">
+                                <i data-lucide="refresh-ccw" class="text-blue-400"></i>
                             </div>
                             <div>
-                                <h3 class="text-xl font-bold">Sensory Mapping (Digital)</h3>
-                                <p class="text-slate-400 text-sm mt-1">
-                                    Une app style "Waze" qui cartographie en temps réel les zones de calme, les toilettes non-genrées et les espaces safe du campus.
-                                </p>
+                                <h4 class="font-bold text-white">1. Le Marketplace Circulaire</h4>
+                                <p class="text-sm text-slate-400 mt-1">Prêt de matériel et réservation d'espaces inter-écoles. Géolocalisé par campus.</p>
                             </div>
                         </div>
 
-                        <div class="flex gap-4">
-                            <div class="w-12 h-12 rounded-xl bg-teal-500/20 flex-shrink-0 flex items-center justify-center text-teal-400">
-                                <i data-lucide="box"></i>
+                        <div class="flex items-start gap-4 p-4 rounded-xl hover:bg-white/5 transition border border-transparent hover:border-slate-700">
+                            <div class="mt-1">
+                                <i data-lucide="zap" class="text-yellow-400"></i>
                             </div>
                             <div>
-                                <h3 class="text-xl font-bold">Les Cocons (Physique)</h3>
-                                <p class="text-slate-400 text-sm mt-1">
-                                    Mobilier design, insonorisé et bio-sourcé, installé dans les halls pour permettre aux étudiants de "décharger" leur stress sans quitter l'école.
-                                </p>
+                                <h4 class="font-bold text-white">2. Le Skill-Swap (Troc de Talents)</h4>
+                                <p class="text-sm text-slate-400 mt-1">IA de matching : "Je code ton app (5h)" contre "Tu fais ma charte graphique (5h)".</p>
                             </div>
                         </div>
 
-                        <div class="flex gap-4">
-                            <div class="w-12 h-12 rounded-xl bg-pink-500/20 flex-shrink-0 flex items-center justify-center text-pink-400">
-                                <i data-lucide="shield"></i>
+                        <div class="flex items-start gap-4 p-4 rounded-xl hover:bg-white/5 transition border border-transparent hover:border-slate-700">
+                            <div class="mt-1">
+                                <i data-lucide="coins" class="text-green-400"></i>
                             </div>
                             <div>
-                                <h3 class="text-xl font-bold">Certification "Safe Zone"</h3>
-                                <p class="text-slate-400 text-sm mt-1">
-                                    Un label interne IONIS garantissant que l'espace respecte la charte d'inclusivité radicale.
-                                </p>
+                                <h4 class="font-bold text-white">3. Le IONIS Token</h4>
+                                <p class="text-sm text-slate-400 mt-1">Monnaie interne (non-crypto spéculative) pour valoriser les échanges et garantir l'équité.</p>
                             </div>
                         </div>
                     </div>
                 </div>
 
+                <!-- Right: UI Mockup -->
+                <div class="col-span-7 relative flex justify-center">
+                    <div class="relative w-[380px] h-[700px] bg-slate-900 rounded-[3rem] border-8 border-slate-800 shadow-2xl overflow-hidden">
+                        <!-- StatusBar -->
+                        <div class="absolute top-0 w-full h-8 bg-slate-900 z-20 flex justify-between px-6 items-center">
+                            <span class="text-[10px] text-white">9:41</span>
+                            <div class="flex gap-1">
+                                <div class="w-4 h-4 bg-slate-800 rounded-full"></div>
+                                <div class="w-4 h-4 bg-slate-800 rounded-full"></div>
+                            </div>
+                        </div>
+
+                        <!-- App Header -->
+                        <div class="pt-12 px-6 pb-6 bg-slate-900 border-b border-slate-800">
+                            <div class="flex justify-between items-center mb-6">
+                                <div>
+                                    <h2 class="text-xl font-bold text-white">Bonjour, Thomas</h2>
+                                    <p class="text-xs text-slate-400">Epitech Promo 2027</p>
+                                </div>
+                                <div class="text-right">
+                                    <div class="text-xl font-bold text-blue-400">450 TK</div>
+                                    <p class="text-[10px] text-slate-500">Crédit disponible</p>
+                                </div>
+                            </div>
+                            <!-- Search -->
+                            <div class="bg-slate-800 rounded-xl p-3 flex items-center gap-3 text-slate-400 text-sm">
+                                <i data-lucide="search" class="w-4 h-4"></i>
+                                <span>Chercher matériel, talent...</span>
+                            </div>
+                        </div>
+
+                        <!-- Content -->
+                        <div class="p-6 space-y-6 bg-slate-900 h-full">
+                            <!-- Section 1 -->
+                            <div>
+                                <div class="flex justify-between items-center mb-3">
+                                    <h3 class="text-sm font-bold text-white">Autour de toi (Le Kremlin-Bicêtre)</h3>
+                                </div>
+                                <div class="flex gap-3 overflow-x-auto pb-2">
+                                    <div class="min-w-[120px] bg-slate-800 p-3 rounded-xl border border-slate-700">
+                                        <div class="h-20 bg-slate-700 rounded-lg mb-2 relative overflow-hidden">
+                                            <img src="https://images.unsplash.com/photo-1516035069371-29a1b244cc32?w=200&q=80" class="object-cover w-full h-full opacity-60">
+                                        </div>
+                                        <div class="text-xs font-bold text-white">Sony Alpha 7</div>
+                                        <div class="text-[10px] text-blue-400">50 TK / jour</div>
+                                    </div>
+                                    <div class="min-w-[120px] bg-slate-800 p-3 rounded-xl border border-slate-700">
+                                        <div class="h-20 bg-slate-700 rounded-lg mb-2 relative overflow-hidden">
+                                            <img src="https://images.unsplash.com/photo-1555774698-0b77e0d5fac6?w=200&q=80" class="object-cover w-full h-full opacity-60">
+                                        </div>
+                                        <div class="text-xs font-bold text-white">Oculus Quest</div>
+                                        <div class="text-[10px] text-blue-400">30 TK / jour</div>
+                                    </div>
+                                </div>
+                            </div>
+
+                            <!-- Section 2 -->
+                            <div>
+                                <h3 class="text-sm font-bold text-white mb-3">Demandes Urgentes</h3>
+                                <div class="space-y-3">
+                                    <div class="bg-slate-800 p-3 rounded-xl border border-slate-700 flex gap-3 items-center">
+                                        <div class="w-10 h-10 rounded-full bg-pink-900/50 flex items-center justify-center text-pink-400 font-bold text-xs">ISG</div>
+                                        <div class="flex-1">
+                                            <div class="text-xs font-bold text-white">Montage Vidéo Pitch</div>
+                                            <div class="text-[10px] text-slate-400">Besoin: Adobe Premiere Pro</div>
+                                        </div>
+                                        <div class="text-green-400 font-bold text-xs">+120 TK</div>
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+
+                        <!-- Bottom Nav -->
+                        <div class="absolute bottom-0 w-full bg-slate-900/90 backdrop-blur border-t border-slate-800 p-4 flex justify-around">
+                            <i data-lucide="home" class="text-blue-500 w-5 h-5"></i>
+                            <i data-lucide="plus-circle" class="text-slate-500 w-5 h-5"></i>
+                            <i data-lucide="message-square" class="text-slate-500 w-5 h-5"></i>
+                            <i data-lucide="user" class="text-slate-500 w-5 h-5"></i>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
-        <!-- SLIDE 4: THE SYNERGY (Collaboration) -->
+        <!-- SLIDE 4: COLLAB & BUSINESS MODEL -->
         <div class="slide" id="slide-3">
-            <div class="max-w-6xl mx-auto w-full text-center">
-                <h2 class="text-4xl font-bold mb-4">La Force du Groupe IONIS</h2>
-                <p class="text-slate-400 mb-16 max-w-2xl mx-auto">Un projet impossible à réaliser seul. Chaque école apporte sa brique critique à l'édifice.</p>
-                
-                <div class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-4 gap-6">
-                    
-                    <!-- EPITA / TECH -->
-                    <div class="mockup-card p-6 flex flex-col items-center hover:-translate-y-2 transition duration-300 border-t-4 border-t-blue-500">
-                        <div class="mb-4 p-3 bg-blue-500/10 rounded-full text-blue-400">
-                            <i data-lucide="cpu" class="w-8 h-8"></i>
+            <div class="max-w-6xl mx-auto w-full">
+                <div class="grid grid-cols-1 lg:grid-cols-2 gap-12">
+                    <!-- Collab -->
+                    <div>
+                        <h2 class="text-3xl font-bold mb-8">Synergie IONIS</h2>
+                        <div class="grid grid-cols-2 gap-4">
+                            <div class="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                                <div class="text-blue-400 font-bold text-sm mb-1">EPITECH / EPITA</div>
+                                <div class="text-xs text-slate-400">Architecture Backend, Blockchain (Sécurité transactions), Algo de Matching.</div>
+                            </div>
+                            <div class="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                                <div class="text-pink-400 font-bold text-sm mb-1">e-artsup</div>
+                                <div class="text-xs text-slate-400">UX/UI Design, Gamification de l'expérience, Identité visuelle.</div>
+                            </div>
+                            <div class="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                                <div class="text-amber-400 font-bold text-sm mb-1">ISG / ISEG</div>
+                                <div class="text-xs text-slate-400">Modèle économique des Tokens, Partenariats B2B (Sponsors matériel).</div>
+                            </div>
+                            <div class="p-4 bg-slate-800/50 rounded-xl border border-slate-700">
+                                <div class="text-green-400 font-bold text-sm mb-1">SUP'BIOTECH</div>
+                                <div class="text-xs text-slate-400">Analyse cycle de vie (Impact écologique), Calcul empreinte carbone évitée.</div>
+                            </div>
                         </div>
-                        <h3 class="font-bold text-lg mb-2">EPITA / Epitech</h3>
-                        <span class="role-badge mb-4 text-xs">Technologie</span>
-                        <ul class="text-sm text-slate-400 text-left space-y-2 w-full">
-                            <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-blue-500"></i> Dev App Mobile</li>
-                            <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-blue-500"></i> Capteurs IoT Bruit</li>
-                            <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-blue-500"></i> IA Prédictive</li>
-                        </ul>
                     </div>
 
-                    <!-- E-ARTSUP / DESIGN -->
-                    <div class="mockup-card p-6 flex flex-col items-center hover:-translate-y-2 transition duration-300 border-t-4 border-t-pink-500">
-                        <div class="mb-4 p-3 bg-pink-500/10 rounded-full text-pink-400">
-                            <i data-lucide="palette" class="w-8 h-8"></i>
+                    <!-- Why Win -->
+                    <div class="flex flex-col justify-center pl-8 border-l border-slate-800">
+                        <h2 class="text-3xl font-bold mb-6">Pourquoi PRISM gagne ?</h2>
+                        <ul class="space-y-6">
+                            <li class="flex gap-4">
+                                <div class="w-8 h-8 rounded-full bg-green-500/20 flex items-center justify-center text-green-400 shrink-0">
+                                    <i data-lucide="check"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-lg">Impact Social Réel</h4>
+                                    <p class="text-sm text-slate-400">Égalité des chances. Un étudiant sans budget accède au même matériel qu'un étudiant aisé grâce à ses compétences.</p>
+                                </div>
+                            </li>
+                            <li class="flex gap-4">
+                                <div class="w-8 h-8 rounded-full bg-blue-500/20 flex items-center justify-center text-blue-400 shrink-0">
+                                    <i data-lucide="check"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-lg">Professionnalisant</h4>
+                                    <p class="text-sm text-slate-400">Les étudiants pratiquent leurs métiers (Code, Design, Marketing) sur des cas réels internes.</p>
+                                </div>
+                            </li>
+                            <li class="flex gap-4">
+                                <div class="w-8 h-8 rounded-full bg-purple-500/20 flex items-center justify-center text-purple-400 shrink-0">
+                                    <i data-lucide="check"></i>
+                                </div>
+                                <div>
+                                    <h4 class="font-bold text-lg">Scalabilité</h4>
+                                    <p class="text-sm text-slate-400">Commence à IONIS, revendable en marque blanche à d'autres groupes ou entreprises.</p>
+                                </div>
+                            </li>
+                        </ul>
+                        
+                        <div class="mt-10">
+                            <button class="w-full py-4 bg-white text-slate-900 font-bold rounded-lg hover:bg-slate-200 transition">
+                                Soutenir le projet
+                            </button>
                         </div>
-                        <h3 class="font-bold text-lg mb-2">e-artsup</h3>
-                        <span class="role-badge mb-4 text-xs">Design Inclusif</span>
-                        <ul class="text-sm text-slate-400 text-left space-y-2 w-full">
-                            <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-pink-500"></i> UX/UI Accessible</li>
-                            <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-pink-500"></i> Design des Pods</li>
-                            <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-pink-500"></i> Identité Visuelle</li>
-                        </ul>
-                    </div>
-
-                    <!-- ISG / BUSINESS -->
-                    <div class="mockup-card p-6 flex flex-col items-center hover:-translate-y-2 transition duration-300 border-t-4 border-t-amber-500">
-                        <div class="mb-4 p-3 bg-amber-500/10 rounded-full text-amber-400">
-                            <i data-lucide="briefcase" class="w-8 h-8"></i>
-                        </div>
-                        <h3 class="font-bold text-lg mb-2">ISG / ISEG</h3>
-                        <span class="role-badge mb-4 text-xs">Stratégie & RSE</span>
-                        <ul class="text-sm text-slate-400 text-left space-y-2 w-full">
-                            <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-amber-500"></i> Business Model</li>
-                            <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-amber-500"></i> Partenariats RSE</li>
-                            <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-amber-500"></i> Communication</li>
-                        </ul>
-                    </div>
-
-                    <!-- SUPBIOTECH / SCIENCE -->
-                    <div class="mockup-card p-6 flex flex-col items-center hover:-translate-y-2 transition duration-300 border-t-4 border-t-green-500">
-                        <div class="mb-4 p-3 bg-green-500/10 rounded-full text-green-400">
-                            <i data-lucide="flask-conical" class="w-8 h-8"></i>
-                        </div>
-                        <h3 class="font-bold text-lg mb-2">SupBiotech</h3>
-                        <span class="role-badge mb-4 text-xs">Bien-être Bio</span>
-                        <ul class="text-sm text-slate-400 text-left space-y-2 w-full">
-                            <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-green-500"></i> Matériaux Sains</li>
-                            <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-green-500"></i> Étude Stress/Cortisol</li>
-                            <li class="flex gap-2"><i data-lucide="check" class="w-4 h-4 text-green-500"></i> Ergonomie</li>
-                        </ul>
-                    </div>
-
-                </div>
-            </div>
-        </div>
-
-        <!-- SLIDE 5: IMPACT & CONCLUSION -->
-        <div class="slide" id="slide-4">
-            <div class="max-w-4xl mx-auto w-full text-center">
-                <div class="mb-8 inline-block p-4 rounded-full bg-slate-800 border border-slate-700 shadow-2xl">
-                     <i data-lucide="trophy" class="w-16 h-16 text-yellow-400 mx-auto animate-pulse"></i>
-                </div>
-                <h2 class="text-5xl font-bold mb-6">Pourquoi PRISM va gagner ?</h2>
-                
-                <div class="grid grid-cols-1 md:grid-cols-3 gap-6 text-left mb-12">
-                    <div class="p-6 rounded-2xl bg-white/5 border border-white/10">
-                        <div class="text-3xl font-bold text-purple-400 mb-2">100%</div>
-                        <div class="font-semibold text-white">Réalisable</div>
-                        <p class="text-sm text-slate-400">MVP possible avec le budget de la bourse (App + 1 Prototype).</p>
-                    </div>
-                    <div class="p-6 rounded-2xl bg-white/5 border border-white/10">
-                        <div class="text-3xl font-bold text-teal-400 mb-2">Impact</div>
-                        <div class="font-semibold text-white">Immédiat</div>
-                        <p class="text-sm text-slate-400">Améliore la vie étudiante dès le jour 1 de l'installation.</p>
-                    </div>
-                    <div class="p-6 rounded-2xl bg-white/5 border border-white/10">
-                        <div class="text-3xl font-bold text-pink-400 mb-2">Scalable</div>
-                        <div class="font-semibold text-white">Vendable</div>
-                        <p class="text-sm text-slate-400">Un produit qui peut être revendu aux entreprises partenaires.</p>
                     </div>
                 </div>
-
-                <p class="text-2xl font-medium text-slate-300 italic mb-10">
-                    "Faire de IONIS le premier groupe éducatif mondial certifié 'Neuro-Inclusive'."
-                </p>
-
-                <button class="px-10 py-5 bg-gradient-to-r from-purple-600 to-pink-600 rounded-full font-bold text-lg shadow-lg hover:shadow-purple-500/50 transition transform hover:-translate-y-1">
-                    Voter pour PRISM
-                </button>
             </div>
         </div>
 
     </div>
 
     <script>
-        // Init Icons
         lucide.createIcons();
 
-        // Slide Logic
         let currentSlide = 0;
-        const totalSlides = 5;
+        const totalSlides = 4;
         const slides = document.querySelectorAll('.slide');
-        const dots = document.querySelectorAll('.dot');
-
-        function updateSlides() {
+        
+        function updateUI() {
+            // Update slides
             slides.forEach((slide, index) => {
                 if(index === currentSlide) {
                     slide.classList.add('active');
@@ -446,42 +474,39 @@
                 }
             });
 
-            dots.forEach((dot, index) => {
-                if(index === currentSlide) {
-                    dot.classList.add('active');
+            // Update indicators
+            for(let i=0; i<totalSlides; i++) {
+                const el = document.getElementById(`indicator-${i}`);
+                if(i === currentSlide) {
+                    el.classList.remove('bg-slate-700', 'w-8');
+                    el.classList.add('bg-blue-500', 'w-12');
                 } else {
-                    dot.classList.remove('active');
+                    el.classList.add('bg-slate-700', 'w-8');
+                    el.classList.remove('bg-blue-500', 'w-12');
                 }
-            });
+            }
         }
 
         function nextSlide() {
             if (currentSlide < totalSlides - 1) {
                 currentSlide++;
-                updateSlides();
+                updateUI();
             }
         }
 
         function prevSlide() {
             if (currentSlide > 0) {
                 currentSlide--;
-                updateSlides();
+                updateUI();
             }
         }
 
-        function goToSlide(index) {
-            currentSlide = index;
-            updateSlides();
-        }
-
-        // Keyboard navigation
         document.addEventListener('keydown', (e) => {
-            if (e.key === 'ArrowRight' || e.key === ' ') {
-                nextSlide();
-            } else if (e.key === 'ArrowLeft') {
-                prevSlide();
-            }
+            if (e.key === 'ArrowRight') nextSlide();
+            if (e.key === 'ArrowLeft') prevSlide();
         });
+
+        updateUI();
     </script>
 </body>
 </html>
